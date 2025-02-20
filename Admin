@@ -1,0 +1,10 @@
+from dataclasses import dataclass, asdict
+
+class Admin:
+    id: int
+    name: str
+
+
+def initAdmin(id:int, name:str):
+    return Admin(id, name)
+
