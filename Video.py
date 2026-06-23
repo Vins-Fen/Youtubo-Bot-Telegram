@@ -8,8 +8,10 @@ from googleapiclient.errors import HttpError
 from pytube import YouTube
 from telegram import Update
 from telegram.ext import ContextTypes
+from dotenv import load_dotenv
+import os
 
-YTAPI_KEY= "AIzaSyDnXyjJ7CltocH4RjDFf7D3S5lKfXHMssM"
+YTAPI_KEY= os.getenv("YOUTUBE_TOKEN_API")
 
 @dataclass
 class Video:
