@@ -1,6 +1,11 @@
+import csv
 import json
+import os
 from dataclasses import dataclass, asdict
-from Video import Video
+
+from googleapiclient.discovery import build
+
+from Video import Video, YTAPI_KEY
 
 
 @dataclass
@@ -10,13 +15,43 @@ class Youtuber:
     handle: str
     counter_followers: int
     total_views: int
-    videos: list[Video]
+
+
+def get_channel_id_from_handle(youtube_handle):
+    if youtube_handle.startswith("@"):  # Rimuove il simbolo '@' se presente
+        youtube_handle = youtube_handle[1:]
+
+    youtube = build("youtube", "v3", developerKey=YTAPI_KEY)
+
+    try:
+        request = youtube.search().list(
+            part="snippet",
+            q=youtube_handle,
+            type="channel",
+            maxResults=1
+        )
+        response = request.execute()
+
+        if "items" in response and len(response["items"]) > 0:
+            channel_id = response["items"][0]["id"]["channelId"]
+
+
+            return channel_id
+        else:
+            return None
+    except Exception as e:
+        print("Errore API YouTube:", e)
+        return None
 
 
 
 def newYoutuber( id: str, user_id:int, youtube_handle: str, subscriber_count: int, total_views: int) -> Youtuber:
-    videos= []
-    return Youtuber(id, user_id, youtube_handle, subscriber_count, total_views, videos)
+          return Youtuber(id, user_id, youtube_handle, subscriber_count, total_views)
+
+
+
+
+
 
 def add_video(self, user_id, video):
             """Aggiunge un video alla lista."""
@@ -43,13 +78,14 @@ def salva_su_file(youtuber: Youtuber, filename: str = "youtubers.json"):
 
 
 def carica_da_file(filename: str = "youtubers.json"):
-    """Carica e restituisce la lista di youtuber salvati nel file JSON."""
+   # Carica e restituisce la lista di youtuber salvati nel file JSON.
     try:
         with open(filename, "r") as f:
             data = json.load(f)
         return data
     except FileNotFoundError:
         return []
+
 
 
 def to_dict(self):
@@ -59,7 +95,6 @@ def to_dict(self):
         "handle": self.handle,
         "subscribers": self.counter_followers,
         "total_views": self.total_views,
-        "videos": [video.to_dict() for video in self.videos]  # Lista di video convertiti in dizionario
     }
 
 
